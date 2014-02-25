@@ -9,7 +9,7 @@ def main():
 	filepath = sys.argv[1]
 	c = client.create_client()
 	revisions = c.revisions(filepath)
-	if not revisions[0].has_key('is_deleted'):
+	if not revisions[0].has_key('is_deleted') and revisions[0]['is_deleted']:
 		print 'File is not deleted'
 		return
 
