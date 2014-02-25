@@ -2,6 +2,11 @@ Dropbox Recovery Tools
 ======================
 A set of utilities for recovering deleted Dropbox files.
 
+Installation
+============
+Dropbox Python SDK can be installed using
+$ pip install dropbox
+
 Configuration
 =============
 For the utilities to be authorized to access you Dropbox
