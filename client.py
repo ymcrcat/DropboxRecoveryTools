@@ -39,7 +39,7 @@ def create_client():
 		cookie_content = json.dumps(access_token)
 		open(COOKIE_FILE, 'w').write(cookie_content)
 	
-	print 'linked account: ', client.account_info()
+	# print 'linked account: ', client.account_info()
 	return client
 
 def main():
