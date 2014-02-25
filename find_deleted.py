@@ -24,7 +24,7 @@ def main():
 	search_root = sys.argv[1]
 	if len(sys.argv) > 2:
 		date = sys.argv[2]
-		print 'Filtering by date:', date
+		# print 'Filtering by date:', date
 	else:
 		date = None
 	c = client.create_client()
