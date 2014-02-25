@@ -12,12 +12,11 @@ def find_deleted_files(c, path, date=None):
 	deleted_files = [f for f in files if f.has_key('is_deleted')]
 	if date:
 		deleted_files = [f for f in deleted_files if f['modified'].find(date) >= 0]
-	deleted_files = [f['path'] for f in deleted_files]
 	dirs  = [d['path'] for d in meta['contents'] if d['is_dir']]
-	if len(deleted_files) > 0:
-		print '\n'.join(deleted_files)
+	for f in deleted_files:
+		print f['path']
 	for d in dirs:
-		deleted_files.extend(find_deleted_files(c, d))
+		deleted_files.extend(find_deleted_files(c, d, date))
 		sleep(RATE_LIMITING_DELAY)
 	return deleted_files
 
@@ -25,6 +24,7 @@ def main():
 	search_root = sys.argv[1]
 	if len(sys.argv) > 2:
 		date = sys.argv[2]
+		print 'Filtering by date:', date
 	else:
 		date = None
 	c = client.create_client()
