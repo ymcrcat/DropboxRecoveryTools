@@ -4,7 +4,7 @@ import client
 import sys
 from time import sleep
 
-RATE_LIMITING_DELAY = 0.05
+RATE_LIMITING_DELAY = 0.01
 
 def find_deleted_files(c, path, date=None):
 	meta = c.metadata(path, include_deleted=True)
