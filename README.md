@@ -19,3 +19,6 @@ Create a file named config.json with the content
 	"app_key" : "YOUR_APP_KEY",
 	"app_secret" : "YOUR_APP_SECRET"
 }
+
+Alternatively you can run
+$ ./make_config.sh > config.json
