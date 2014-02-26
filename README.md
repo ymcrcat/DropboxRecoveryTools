@@ -5,6 +5,7 @@ A set of utilities for recovering deleted Dropbox files.
 Installation
 ============
 Dropbox Python SDK can be installed using
+
 $ pip install dropbox
 
 Configuration
@@ -21,4 +22,5 @@ Create a file named config.json with the content
 }
 
 Alternatively you can run
+
 $ ./make_config.sh YOUR_APP_KEY YOUR_APP_SECRET > config.json
