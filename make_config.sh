@@ -1,5 +1,5 @@
 #!/bin/sh
 echo "{
-	\"app_key\" : \"APP_KEY\",
-	\"app_secret\" : \"APP_SECRET\"
+	\"app_key\" : \"$1\",
+	\"app_secret\" : \"$2\"
 }"

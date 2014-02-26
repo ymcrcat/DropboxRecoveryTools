@@ -21,4 +21,4 @@ Create a file named config.json with the content
 }
 
 Alternatively you can run
-$ ./make_config.sh > config.json
+$ ./make_config.sh YOUR_APP_KEY YOUR_APP_SECRET > config.json
