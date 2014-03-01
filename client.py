@@ -8,7 +8,7 @@ import json
 CONFIG_FILE = 'config.json'
 COOKIE_FILE = 'cookie.json'
 
-def get_token(app_key, app_secret):
+def get_token():
 	config = open(CONFIG_FILE, 'r')
 	config_data = json.load(config)
 	app_key = config_data['app_key']
@@ -34,7 +34,7 @@ def create_client():
 		access_token = json.loads(cookie_content)
 		client = dropbox.client.DropboxClient(access_token)
 	except Exception:
-		access_token = get_token(APP_KEY, APP_SECRET)
+		access_token = get_token()
 		client = dropbox.client.DropboxClient(access_token)
 		cookie_content = json.dumps(access_token)
 		open(COOKIE_FILE, 'w').write(cookie_content)
