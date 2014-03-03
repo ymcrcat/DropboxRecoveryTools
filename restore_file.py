@@ -17,7 +17,11 @@ def restore_file(c, filepath):
 def main():
 	c = client.create_client()
 	for line in fileinput.input():
-		restore_file(c, line.strip())
+		try:
+			restore_file(c, line.strip())
+		except Exception:
+			# retry one time
+			restore_file(c, line.strip())
 
 if __name__ == '__main__':
 	main()

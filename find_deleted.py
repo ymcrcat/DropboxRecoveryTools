@@ -16,8 +16,11 @@ def find_deleted_files(c, path, date=None):
 	for f in deleted_files:
 		print f['path']
 	for d in dirs:
-		deleted_files.extend(find_deleted_files(c, d, date))
-		sleep(RATE_LIMITING_DELAY)
+		try:
+			deleted_files.extend(find_deleted_files(c, d, date))
+			sleep(RATE_LIMITING_DELAY)
+		except Exception:
+			print >> sys.stderr, 'Failed processing', d
 	return deleted_files
 
 def main():
