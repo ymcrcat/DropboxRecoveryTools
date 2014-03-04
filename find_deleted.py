@@ -4,7 +4,7 @@ import client
 import sys
 
 def filter_deleted_by_date(files, date=None):
-	deleted_files = [f for f in files if f.has_key('is_deleted')]
+	deleted_files = [f for f in files if not f['is_dir'] and f.has_key('is_deleted')]
 	if date:
 		deleted_files = [f for f in deleted_files if f['modified'].find(date) >= 0]
 	return deleted_files
