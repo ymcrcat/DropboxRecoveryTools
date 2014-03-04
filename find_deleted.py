@@ -2,25 +2,11 @@
 
 import client
 import sys
-from time import sleep
 
-RATE_LIMITING_DELAY = 0.01
-
-def find_deleted_files(c, path, date=None):
-	meta = c.metadata(path, include_deleted=True)
-	files = [f for f in meta['contents'] if not f['is_dir']]
+def filter_deleted_by_date(files, date=None):
 	deleted_files = [f for f in files if f.has_key('is_deleted')]
 	if date:
 		deleted_files = [f for f in deleted_files if f['modified'].find(date) >= 0]
-	dirs  = [d['path'] for d in meta['contents'] if d['is_dir']]
-	for f in deleted_files:
-		print f['path']
-	for d in dirs:
-		try:
-			deleted_files.extend(find_deleted_files(c, d, date))
-			sleep(RATE_LIMITING_DELAY)
-		except Exception:
-			print >> sys.stderr, 'Failed processing', d
 	return deleted_files
 
 def main():
@@ -31,7 +17,8 @@ def main():
 	else:
 		date = None
 	c = client.create_client()
-	deleted_files = find_deleted_files(c, search_root, date)
+	filter_func = lambda files: filter_deleted_by_date(files, date)
+	deleted_files = client.find_files(c, search_root, True, filter_func)
 
 if __name__ == '__main__':
 	main()

@@ -3,10 +3,12 @@
 import sys
 import dropbox
 import json
+from time import sleep
 
 # Get your app key and secret from the Dropbox developer website
 CONFIG_FILE = 'config.json'
 COOKIE_FILE = 'cookie.json'
+RATE_LIMITING_DELAY = 0.01
 
 def get_token():
 	config = open(CONFIG_FILE, 'r')
@@ -41,6 +43,23 @@ def create_client():
 	
 	# print 'linked account: ', client.account_info()
 	return client
+
+def find_files(c, path, include_deleted=False, filter_func=None):
+	meta = c.metadata(path, include_deleted=include_deleted)
+	files = [f for f in meta['contents'] if not f['is_dir']]
+	if filter_func:
+		files = filter_func(files)
+	dirs  = [d['path'] for d in meta['contents'] if d['is_dir']]
+	for f in files:
+		print f['path']
+	for d in dirs:
+		try:
+			files.extend(find_files(c, d, include_deleted, filter_func))
+			sleep(RATE_LIMITING_DELAY)
+		except Exception, e:
+			print >> sys.stderr, 'Failed processing', d
+			print >> sys.stderr, e
+	return files
 
 def main():
 	c = create_client()
