@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Dropbox Recovery Tools by ymcrcat</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/ymcrcat/DropboxRecoveryTools">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/ymcrcat/DropboxRecoveryTools/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/ymcrcat/DropboxRecoveryTools/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Dropbox Recovery Tools</h1>
+          <p>Recover tons of deleted files in your Dropbox</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/ymcrcat">ymcrcat</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <p>It all started a couple of days before a paper submission deadline - when I really needed my data accessible, and my code available. I store all my academic stuff in my Dropbox folder, so it is backed up to the cloud. Lo and behold, Murphy entered the game and caused my Mac to halt, and when I forced a reboot it apparently resulted in some inconsistent state of the Dropbox client. This drove Dropbox  into deleting tens of thousands of files from my account, causing files to be deleted remotely and locally, under the tips of my typing fingers. The only thing I had is previous remote revisions of the files.
+I don't have Dropbox Pro and therefore don't have <a href="https://www.dropbox.com/help/113/en">PackRat</a>, which anyway I'm not sure would help in this case. Besides, I didn't actually care about indefinitely long history, but about quick and convenient recovery. I've decided to take a look at the Dropbox API. I found it quite easy, using the supplied <a href="https://www.dropbox.com/developers/core/sdks/python">Python Dropbox SDK</a>, to write several tools to help me search and recover my deleted files.
+The Dropbox Python SDK can be either downloaded and installed using <em>setup.py</em> or using</p>
+
+<pre><code>$ pip install dropbox
+</code></pre>
+
+<p>In order to access your Dropbox you need to create a Dropbox application that's linked to your account. It can be done through the Dropbox application console (<a href="https://www.dropbox.com/developers/apps"></a><a href="https://www.dropbox.com/developers/apps">https://www.dropbox.com/developers/apps</a>) and gets you an application key and application secret which are later used by the Python scripts to obtain a token that enables accessing your Dropbox storage.
+I store the application key and secret in a JSON configuration file, and written a tiny helper script to generate this JSON (make_config.sh):</p>
+
+<pre><code>echo "{
+  "app_key" : "$1",
+  "app_secret" : "$2"
+}"
+</code></pre>
+
+<p>The code to obtain an access token for all further actions looks like that</p>
+
+<pre><code>import dropbox
+def get_token():
+  config = open(CONFIG_FILE, 'r')
+  config_data = json.load(config)
+  app_key = config_data['app_key']
+  app_secret = config_data['app_secret']
+
+  flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
+  authorize_url = flow.start()
+
+  # Have the user sign in and authorize this token
+  authorize_url = flow.start()
+  print '1. Go to: ' + authorize_url
+  print '2. Click "Allow" (you might have to log in first)'
+  print '3. Copy the authorization code.'
+  code = raw_input("Enter the authorization code here: ").strip()
+
+  # This will fail if the user enters an invalid authorization code
+  access_token, user_id = flow.finish(code)
+  return access_token
+</code></pre>
+
+<p>The access token is stored in a cookie file for later use.</p>
+
+<pre><code>def create_client():
+  try:
+    cookie_content = open(COOKIE_FILE, 'r').read()
+    access_token = json.loads(cookie_content)
+    client = dropbox.client.DropboxClient(access_token)
+  except Exception:
+    access_token = get_token()
+    client = dropbox.client.DropboxClient(access_token)
+    cookie_content = json.dumps(access_token)
+    open(COOKIE_FILE, 'w').write(cookie_content)
+</code></pre>
+
+<p>Once we have initialized a client we have access to all kind of methods such as <em>metadata, revisions,  restore, file_delete, </em>etc. There are several utilities provided:<br>
+<em>find_deleted</em> - Finds deleted file under a given path (optionally by date)<br>
+<em>ls</em> - Lists files (optionally by date)<br>
+<em>restore_file</em> - Restores files. Paths are provided through standard input.<br>
+<em>delete_files</em> - Deletes files. Paths are provided through standard input.<br></p>
+
+<p>Using these utilities I was able to restore all my accidentally deleted files in a matter of hours. One small technical detail I had to apply is to handle rate limiting imposed by Dropbox. Once in a while an operation would result in an exception if too many actions were attempted in a short amount of time. I had to catch this, and retry the operation.</p>
+
+<p>The code is available under <a href="https://github.com/ymcrcat/DropboxRecoveryTools"></a><a href="https://github.com/ymcrcat/DropboxRecoveryTools">https://github.com/ymcrcat/DropboxRecoveryTools</a>.</p>
+
+<h3>
+<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+
+<p>The project is maintained by Yan Michalevsky (<a href="https://github.com/ymcrcat" class="user-mention">@ymcrcat</a>).
+If you have suggestions you can contact him using the contact form on <a href="http://www.stanford.edu/%7Eyanm2/contact.html">http://www.stanford.edu/~yanm2/contact.html</a></p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
