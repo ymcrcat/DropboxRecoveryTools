@@ -1,6 +1,8 @@
 Dropbox Recovery Tools
 ======================
 A set of utilities for recovering deleted Dropbox files.
+More details are on the website:
+http://ymcrcat.github.io/DropboxRecoveryTools
 
 Installation
 ============
